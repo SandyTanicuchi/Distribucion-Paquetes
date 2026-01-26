@@ -3,7 +3,6 @@ import heapq
 from collections import deque
 import re
 def contraseña_segura(password):
-
     if (re.search(r"[A-Z]", password) and
         re.search(r"[a-z]", password) and
         re.search(r"[0-9]", password)):
@@ -44,7 +43,7 @@ def leer_centros():
         with open("centros.txt", "r") as f:
             for linea in f:
                 id, nombre, region, subregion = linea.strip().split(',')
-                centros[int(id)] = nombre
+                centros[int(id)] = (nombre, region, subregion)
     return centros
 
 def agregar_centro():
@@ -174,7 +173,10 @@ def matriz_costos():
         for vecino, costo in g.get(c, []):
             j = ids.index(vecino)
             m[i][j] = costo
-
+    print("\nMatriz de costos:")
+    for fila in m:
+        print(fila)
+        
 def ordenar_centros():
     centros= leer_centros()
     centros_ordenados= sorted(leer_centros().items(), key=lambda x: x[1][0]):
