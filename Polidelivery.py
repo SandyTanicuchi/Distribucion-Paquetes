@@ -132,7 +132,11 @@ def dfs(grafo, inicio, visitados=None):
             orden.extend(dfs(grafo, vecino, visitados))
     
     return orden
-def mostrar_arbol(n, lvl=0):
+class Nodo:
+    def __init__(self, nombre):
+        self.nombre = nombre
+        self.hijos = []
+def mostrar_arbol(nodo, nivel=0):
     print("  " * nivel+ "- " + nodo.nombre)
     for hijo in nodo.hijos:
         mostrar_arbol(hijo, nivel + 1)
@@ -243,7 +247,7 @@ def menu_cliente():
         print("2. Ruta mas economica")
         print("3. Ver recorrido BFS")
         print("4. Ver recorrido DFS")
-        print("3. Salir")
+        print("5. Salir")
         op = input("Ingrese una opcion: ")
 
         if op == '1':
@@ -258,17 +262,17 @@ def menu_cliente():
                 print("Costo total:", costo)
             else:
                 print("No existe ruta")
-        elif opcion == '3':
+        elif op == '3':
             grafo = leer_rutas()
             inicio = int(input("Centro inicio (ID): "))
             orden = bfs(grafo, inicio)
             print("Recorrido BFS:", " -> ".join(str(nodo) for nodo in orden))
-        elif opcion == '4':
+        elif op == '4':
             grafo = leer_rutas()
             inicio = int(input("Centro inicio (ID): "))
             orden = dfs(grafo, inicio)
             print("Recorrido DFS:", " -> ".join(str(nodo) for nodo in orden))
-        elif opcion == '5':
+        elif op == '5':
             break
         
 def main():
