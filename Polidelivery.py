@@ -32,9 +32,10 @@ def iniciar_sesion():
     with open("usuarios.txt", "r") as f:
         for linea in f:
             datos = linea.strip().split(',')
-            if datos[4] == email and datos[5] == password:
-                print("Sesión iniciada")
-                return datos[6]
+            if len(datos) >=7:
+                if datos[4] == email and datos[5] == password:
+                    print("Sesión iniciada")
+                    return datos[6]
     print("Credenciales incorrectas")
     return None
 def leer_centros():
@@ -58,25 +59,28 @@ def agregar_centro():
 def mostrar_centros():
     print("\n--- CENTROS DE DISTRIBUCIÓN ---")
     centros = leer_centros()
-    for id, nombre in centros.items():
-        print(f"{id} -> {nombre}")
+    for id, (nombre, region, subregion) in centros.items():
+        print(f"ID: {id} -> {nombre} ({region} - {subregion})")
 
 def leer_rutas():
     grafo = {}
     if os.path.exists("rutas.txt"):
         with open("rutas.txt", "r") as f:
             for linea in f:
-                o, d, dist, costo = linea.strip().split(',')
-                o = int(o)
-                d = int(d)
-                costo = float(costo)
-                if o not in grafo:
-                    grafo[o] = []
-                if d not in grafo:
-                    grafo[d] = []
-                grafo[o].append((d, costo))
-                grafo[d].append((o, costo))
+                if len(partes) >= 4:
+                    o, d, dist, costo = partes
+                    o, d = int(o), int(d)
+                    dist, costo = float(dist), float(costo)
+                    
+                    if o not in grafo:
+                        grafo[o] = []
+                    if d not in grafo:
+                        grafo[d] = []
+                    
+                    grafo[o].append((d, dist, costo))
+                    grafo[d].append((o, dist, costo))
     return grafo
+
 
 def agregar_ruta():
     o = int(input("Centro origen (ID): "))
