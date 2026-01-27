@@ -241,6 +241,7 @@ def menu_admin():
                 else:
                     print("Centro no encontrado")
             case '8':
+                    cout<<"Saliendo del programa."
                 break
             case _:
                 print("Opcion invalida.")
