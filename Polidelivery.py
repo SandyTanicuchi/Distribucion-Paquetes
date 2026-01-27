@@ -2,6 +2,7 @@ import os
 import heapq
 from collections import deque
 import re
+
 def contraseña_segura(password):
 
     if (re.search(r"[A-Z]", password) and
@@ -9,6 +10,7 @@ def contraseña_segura(password):
         re.search(r"[0-9]", password)):
         return True
     return False
+
 def registrar_usuario():
     print("\n--- REGISTRO DE USUARIO ---")
     nombre = input("Nombre: ")
@@ -23,6 +25,8 @@ def registrar_usuario():
     with open("usuarios.txt", "a") as f:
         f.write(f"{nombre},{apellido},{cedula},{edad},{email},{password},CLIENTE\n")
     print("Usuario registrado correctamente")
+
+
 def iniciar_sesion():
     print("\n--- INICIO DE SESIÓN ---")
     email = input("Correo: ")
@@ -38,6 +42,7 @@ def iniciar_sesion():
                 return datos[6]
     print("Credenciales incorrectas")
     return None
+
 
 def leer_centros():
     centros = {}
@@ -71,6 +76,7 @@ def agregar_centro():
         f.write(f"{id},{nombre},{region},{subregion}\n")
     print("Centro agregado")
 
+
 def mostrar_centros():
     print("\n--- CENTROS DE DISTRIBUCIÓN ---")
     centros = leer_centros()
@@ -81,6 +87,62 @@ def mostrar_centros():
 
     for id, (nombre, region, subregion) in centros.items():
         print(f"ID: {id} | Nombre: {nombre} | Región: {region} | Subregión: {subregion}")
+
+
+# ELIMINAR CENTROS --- AE
+
+def eliminar_centro():
+    id_eliminar = input("ID del centro a eliminar: ")
+
+    if not os.path.exists("centros.txt"):
+        print("No hay centros registrados")
+        return
+
+    with open("centros.txt", "r") as f:
+        lineas = f.readlines()
+
+    with open("centros.txt", "w") as f:
+        eliminado = False
+        for linea in lineas:
+            if not linea.startswith(id_eliminar + ","):
+                f.write(linea)
+            else:
+                eliminado = True
+
+    if not eliminado:
+        print("Centro no encontrado")
+        return
+
+    print("Centro eliminado")
+
+
+
+# ELIMINAR RUTAS --- AE
+
+def eliminar_ruta():
+    o = input("ID centro origen: ")
+    d = input("ID centro destino: ")
+
+    if not os.path.exists("rutas.txt"):
+        print("No hay rutas registradas")
+        return
+
+    with open("rutas.txt", "r") as f:
+        rutas = f.readlines()
+
+    eliminado = False
+    with open("rutas.txt", "w") as f:
+        for ruta in rutas:
+            ro, rd, _, _ = ruta.strip().split(',')
+            if not ((ro == o and rd == d) or (ro == d and rd == o)):
+                f.write(ruta)
+            else:
+                eliminado = True
+
+    if eliminado:
+        print("Ruta eliminada")
+    else:
+        print("Ruta no encontrada")
 
 
 def leer_rutas():
@@ -113,6 +175,7 @@ def agregar_ruta():
         f.write(f"{o},{d},{dist},{costo}\n")
     print(" Ruta agregada")
 
+
 def Camino_corto(grafo, inicio, fin):
     cola = [(0, inicio, [])]
     visitados = set()
@@ -130,6 +193,7 @@ def Camino_corto(grafo, inicio, fin):
                 heapq.heappush(cola, (costo_acum + costo, vecino, camino))
     return None, None
     
+
 def bfs(grafo, inicio):
     visitados = {inicio}
     cola = deque([inicio])
@@ -145,6 +209,7 @@ def bfs(grafo, inicio):
                 cola.append(vecino) 
     return orden
 
+
 def dfs(grafo, inicio, visitados=None):
     if visitados is None:
         visitados = set()
@@ -158,15 +223,18 @@ def dfs(grafo, inicio, visitados=None):
     
     return orden
 
+
 class Nodo:
     def _init_(self, nombre):
         self.nombre = nombre
         self.hijos = []
 
+
 def mostrar_arbol(nodo, nivel =0):
     print("  " * nivel+ "- " + nodo.nombre)
     for hijo in nodo.hijos:
         mostrar_arbol(hijo, nivel + 1)
+
 
 def arbol_regiones():
     raiz = Nodo("Ecuador")
@@ -201,10 +269,12 @@ def matriz_costos():
     for fila in m:
         print(fila)
 
+
 def ordenar_centros():
     centros = leer_centros()
     for id, (nombre, _, _) in sorted(centros.items(), key=lambda x: x[1][0]):
         print(f"{id}: {nombre}")
+
 
 def buscar_centro(nombre):
     centros = leer_centros()
@@ -224,6 +294,8 @@ def buscar_centro(nombre):
             fin = medio - 1
     
     return None
+
+
 def menu_admin():
     while True:
         print("\n--- Menu Administrador ---")
@@ -234,7 +306,9 @@ def menu_admin():
         print("5. Ver matriz de costos")
         print("6. Ordenar centros por nombre")
         print("7. Buscar centro")
-        print("8. Salir")
+        print("8. Eliminar centro")
+        print("9. Eliminar Ruta")
+        print("0. Salir")
         opcion = input("Ingrese una opción: ")
         match opcion:
             case '1':
@@ -258,10 +332,18 @@ def menu_admin():
                     print(f"Encontrado: ID={id_centro}, Nombre={nombre_centro}, Región={region}, Subregión={subregion}")
                 else:
                     print("Centro no encontrado")
+            
             case '8':
+                eliminar_centro()
+            
+            case '9':
+                eliminar_ruta()
+
+            case '0':
                 break
+
             case _:
-                print("Opcion invalida.")
+                print("Opción invalida.")
 
 
 def menu_cliente():
@@ -299,6 +381,7 @@ def menu_cliente():
         elif op == '5':
             break
         
+        
 def main():
     while True:
         print("\n=== POLIDELIVERY ===")
@@ -316,6 +399,6 @@ def main():
             elif rol == "CLIENTE":
                 menu_cliente()
         elif opcion == '3':
-            print("Adios")
+            print("Hasta pronto...")
             break
 main()
