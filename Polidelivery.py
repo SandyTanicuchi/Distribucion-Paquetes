@@ -3,6 +3,7 @@ import heapq
 from collections import deque
 import re
 def contraseña_segura(password):
+
     if (re.search(r"[A-Z]", password) and
         re.search(r"[a-z]", password) and
         re.search(r"[0-9]", password)):
@@ -32,20 +33,34 @@ def iniciar_sesion():
     with open("usuarios.txt", "r") as f:
         for linea in f:
             datos = linea.strip().split(',')
-            if len(datos) >=7:
-                if datos[4] == email and datos[5] == password:
-                    print("Sesión iniciada")
-                    return datos[6]
+            if datos[4] == email and datos[5] == password:
+                print("Sesión iniciada")
+                return datos[6]
     print("Credenciales incorrectas")
     return None
+
 def leer_centros():
     centros = {}
+
     if os.path.exists("centros.txt"):
         with open("centros.txt", "r") as f:
             for linea in f:
-                id, nombre, region, subregion = linea.strip().split(',')
+                linea = linea.strip()
+
+                if not linea:
+                    continue  
+
+                partes = linea.split(',')
+
+                if len(partes) != 4:
+                    print(f"Línea inválida ignorada: {linea}")
+                    continue
+
+                id, nombre, region, subregion = partes
                 centros[int(id)] = (nombre, region, subregion)
+
     return centros
+
 
 def agregar_centro():
     id = input("ID del centro: ")
@@ -59,26 +74,33 @@ def agregar_centro():
 def mostrar_centros():
     print("\n--- CENTROS DE DISTRIBUCIÓN ---")
     centros = leer_centros()
+
+    if not centros:
+        print("No hay centros registrados.")
+        return
+
     for id, (nombre, region, subregion) in centros.items():
-        print(f"ID: {id} -> {nombre} ({region} - {subregion})")
+        print(f"ID: {id} | Nombre: {nombre} | Región: {region} | Subregión: {subregion}")
+
 
 def leer_rutas():
     grafo = {}
+
     if os.path.exists("rutas.txt"):
         with open("rutas.txt", "r") as f:
             for linea in f:
-                if len(partes) >= 4:
-                    o, d, dist, costo = partes
-                    o, d = int(o), int(d)
-                    dist, costo = float(dist), float(costo)
-                    
-                    if o not in grafo:
-                        grafo[o] = []
-                    if d not in grafo:
-                        grafo[d] = []
-                    
-                    grafo[o].append((d, dist, costo))
-                    grafo[d].append((o, dist, costo))
+                o, d, dist, costo = linea.strip().split(',')
+                o, d = int(o), int(d)
+                dist, costo = float(dist), float(costo)
+
+                if o not in grafo:
+                    grafo[o] = []
+                if d not in grafo:
+                    grafo[d] = []
+
+                grafo[o].append((d, dist, costo))
+                grafo[d].append((o, dist, costo))
+
     return grafo
 
 
@@ -96,20 +118,20 @@ def Camino_corto(grafo, inicio, fin):
     visitados = set()
 
     while cola:
-        costo, nodo, camino = heapq.heappop(cola)
+        costo_acum, nodo, camino = heapq.heappop(cola)
         if nodo in visitados:
             continue
         camino = camino + [nodo]
         visitados.add(nodo)
         if nodo == fin:
-            return costo, camino
-        for vecino, peso in grafo.get(nodo, []):
+            return costo_acum, camino
+        for vecino, _,costo in grafo.get(nodo, []):
             if vecino not in visitados:
-                heapq.heappush(cola, (costo + peso, vecino, camino))
+                heapq.heappush(cola, (costo_acum + costo, vecino, camino))
     return None, None
     
 def bfs(grafo, inicio):
-    visitados = set()
+    visitados = {inicio}
     cola = deque([inicio])
     visitados.add(inicio)
     orden = []
@@ -135,11 +157,13 @@ def dfs(grafo, inicio, visitados=None):
             orden.extend(dfs(grafo, vecino, visitados))
     
     return orden
+
 class Nodo:
-    def __init__(self, nombre):
+    def _init_(self, nombre):
         self.nombre = nombre
         self.hijos = []
-def mostrar_arbol(nodo, nivel=0):
+
+def mostrar_arbol(nodo, nivel =0):
     print("  " * nivel+ "- " + nodo.nombre)
     for hijo in nodo.hijos:
         mostrar_arbol(hijo, nivel + 1)
@@ -152,19 +176,15 @@ def arbol_regiones():
         if region not in regiones:
             regiones[region] = Nodo(region)
             raiz.hijos.append(regiones[region])
-        sub_nodo = None
-        for hijo in regiones[region].hijos:
-            if hijo.nombre == subregion:
-                sub_nodo = hijo
-                break
-        
-        if sub_nodo is None:
+        sub_nodo = next((h for h in regiones[region].hijos if h.nombre == subregion), None)
+        if not sub_nodo:
             sub_nodo = Nodo(subregion)
             regiones[region].hijos.append(sub_nodo)
-        centro_nodo = Nodo(f"{nombre} (ID: {id_centro})")
-        sub_nodo.hijos.append(centro_nodo)
-    
+
+        sub_nodo.hijos.append(Nodo(f"{nombre} (ID: {id_centro})"))
+
     return raiz
+        
 
 def matriz_costos():
     centros= leer_centros()
@@ -180,13 +200,11 @@ def matriz_costos():
     print("\nMatriz de costos:")
     for fila in m:
         print(fila)
-        
+
 def ordenar_centros():
-    centros= leer_centros()
-    centros_ordenados= sorted(leer_centros().items(), key=lambda x: x[1][0]):
-    print("\n--- Centros ordenados ---")
-    for id_centro,(nombre, region,subregion)in centros_oredenados:
-        print(f"{id_centro}: {nombre}")
+    centros = leer_centros()
+    for id, (nombre, _, _) in sorted(centros.items(), key=lambda x: x[1][0]):
+        print(f"{id}: {nombre}")
 
 def buscar_centro(nombre):
     centros = leer_centros()
@@ -241,7 +259,6 @@ def menu_admin():
                 else:
                     print("Centro no encontrado")
             case '8':
-                    cout<<"Saliendo del programa."
                 break
             case _:
                 print("Opcion invalida.")
