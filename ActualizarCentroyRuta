@@ -68,7 +68,11 @@ def leer_centros():
 
 
 def agregar_centro():
-    id = input("ID del centro: ")
+   try:
+    id = int(input("ID del centro: "))
+except ValueError:
+    print("ID inválido")
+    return
     nombre = input("Nombre del centro: ")
     region = input("Región: ")
     subregion = input("Subregión: ")
