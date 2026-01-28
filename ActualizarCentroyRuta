@@ -301,13 +301,12 @@ def Camino_corto(grafo, inicio, fin):
 def bfs(grafo, inicio):
     visitados = {inicio}
     cola = deque([inicio])
-    visitados.add(inicio)
     orden = []
     while cola:
         nodo = cola.popleft()
         orden.append(nodo)
         
-        for vecino, _ in grafo.get(nodo, []):
+        for vecino, _, _ in grafo.get(nodo, []):
             if vecino not in visitados:
                 visitados.add(vecino)
                 cola.append(vecino) 
@@ -321,14 +320,14 @@ def dfs(grafo, inicio, visitados=None):
     visitados.add(inicio)
     orden = [inicio]
     
-    for vecino, _ in grafo.get(inicio, []):
+   for vecino, _, _ in grafo.get(inicio, []):
         if vecino not in visitados:
             orden.extend(dfs(grafo, vecino, visitados))
     return orden
 
 
 class Nodo:
-    def _init_(self, nombre):
+    def __init__(self, nombre):
         self.nombre = nombre
         self.hijos = []
 
