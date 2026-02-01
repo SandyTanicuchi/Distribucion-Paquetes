@@ -27,7 +27,8 @@ def registrar_usuario():
     print("Usuario registrado correctamente")
 
 def iniciar_sesion():
-    print("\n--- Iniciar secion ---")
+    print("\n--- Iniciar sesión ---")
+    
     email = input("Correo: ")
     password = input("Contraseña: ")
     if not os.path.exists("usuarios.txt"):
@@ -251,7 +252,7 @@ def merge_sort(centros_list):
     centros_list[k:] = izq[i:] if i < len(izq) else der[j:]
     return centros_list
         
-def buscar_centro(centros_list, nombre):
+def buscar_centro(nombre):
     centros = leer_centros()
     centros_lista = sorted(centros.items(), key=lambda x: x[1][0].lower())
     inicio = 0
@@ -462,3 +463,4 @@ def main():
             print("Hasta pronto...")
             break
 main()
+
