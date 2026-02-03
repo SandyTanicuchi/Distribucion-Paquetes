@@ -11,11 +11,19 @@ def contraseña_segura(password):
     return False
 
 def registrar_usuario():
-    print("\n--- REGISTRO DE USUARIO ---")
+    print("\n--- Registro de Usuario ---")
     nombre = input("Nombre: ")
     apellido = input("Apellido: ")
-    cedula = input("Cédula: ")
+    cedula = input("Cedula: ")
+    # validación cédula: solo dígitos y exactamente 10
+    if not cedula.isdigit() or len(cedula) != 10:
+        print("Cedula invalida: debe contener exactamente 10 numeros")
+        return
     edad = input("Edad: ")
+    # validación edad: solo dígitos
+    if not edad.isdigit():
+        print("Edad invalida: debe ser un numero entero")
+        return
     email = input("Correo (nombre.apellido@gmail.com): ")
     password = input("Contraseña: ")
     if not contraseña_segura(password):
@@ -27,8 +35,7 @@ def registrar_usuario():
     print("Usuario registrado correctamente")
 
 def iniciar_sesion():
-    print("\n--- Iniciar sesión ---")
-    
+    print("\n--- Iniciar sesion ---")
     email = input("Correo: ")
     password = input("Contraseña: ")
     if not os.path.exists("usuarios.txt"):
@@ -168,7 +175,7 @@ def leer_rutas():
 def agregar_ruta():
     o = int(input("Centro origen (ID): "))
     d = int(input("Centro destino (ID): "))
-    dist = input("Distancia: ")        
+    dist = input("Distancia (Km): ")        
     costo = input("Costo: ")
     with open("rutas.txt", "a") as f:
         f.write(f"{o},{d},{dist},{costo}\n")
@@ -215,6 +222,14 @@ class Nodo:
     def __init__(self, nombre):
         self.nombre = nombre
         self.hijos = []
+        self.izquierda = None
+        self.derecha = None
+
+    def agregar_hijo(self, nodo):
+        self.hijos.append(nodo)
+
+    def __repr__(self):
+        return f"Nodo({self.nombre!r})"
 
 def mostrar_arbol(nodo, nivel =0):
     print("  " * nivel+ "- " + nodo.nombre)
@@ -289,7 +304,7 @@ def menu_admin():
         print("5. Eliminar (centro o ruta)")
         print("6. Ver mapa de conexiones")
         print("7. Ver arbol de regiones")
-        print("8. Guaradar en centros.txt ")
+        print("8. Guardar en centros.txt ")
         print("9. Salir")
         opcion = input("Ingrese una opcion: ")
         match opcion:
@@ -330,7 +345,7 @@ def menu_admin():
                 print("Opcion invalida.")
 
 def menu_cliente(nombre, apellido):
-    selecion=[]
+    seleccion=[]
     while True:
         print("\n--- Menu Cliente ---")
         print("1. Ver mapa de centros")
@@ -350,14 +365,27 @@ def menu_cliente(nombre, apellido):
         elif op == '2':
             mostrar_centros()
             grafo = leer_rutas()
-            inicio = int(input("Centro inicio: "))
-            fin = int(input("Centro destino: "))
+
+            try:
+                inicio = int(input("Centro inicio (ID): "))
+                fin = int(input("Centro destino (ID): "))
+            except ValueError:
+                print("Entrada invalida: ingrese solo numeros enteros")
+                continue
+
+            if inicio not in grafo or fin not in grafo:
+                print("Uno o ambos centros NO tienen rutas registradas")
+                continue
+
             costo, camino = Camino_corto(grafo, inicio, fin)
-            if camino:
-                print("Ruta óptima:", camino)
-                print("Costo total:", costo)
+
+            if camino is None:
+                print("No existe ruta economica entre esos centros")
             else:
-                print("No existe ruta")
+                print("Ruta economica encontrada:")
+                print("-> ".join(map(str, camino)))
+                print(f" Costo total: {costo}")
+
         elif op == '3':
             arbol = arbol_regiones()
             mostrar_arbol(arbol)
@@ -406,12 +434,12 @@ def menu_cliente(nombre, apellido):
             if lista:
                 lista = merge_sort(lista)
                 seleccion = [item[0] for item in lista]
-                print("Selección ordenada por nombre del centro:", seleccion)
+                print("Seleccion ordenada por nombre del centro:", seleccion)
             else:
                 print("Ninguno de los IDs seleccionados existe")
 
         elif op == '7':
-            txt = input("Ingrese nueva lista de IDs (coma separada) o Enter para mantener: ")
+            txt = input("Ingrese nueva lista de IDS (coma separada) o Enter para mantener: ")
             if txt.strip():
                 try:
                     nuevos = [int(x.strip()) for x in txt.split(',') if x.strip()]
@@ -423,7 +451,7 @@ def menu_cliente(nombre, apellido):
                 except:
                     print("Formato invalido")
             else:
-                print("Selección no modificada")
+                print("Seleccion no modificada")
 
         elif op == '8':
             seleccion = []
@@ -431,7 +459,7 @@ def menu_cliente(nombre, apellido):
 
         elif op == '9':
             if not seleccion:
-                print("No hay selección para guardar")
+                print("No hay seleccion para guardar")
                 continue
             archivo = f"rutas-{nombre}-{apellido}.txt"
             with open(archivo, "w") as f:
@@ -448,7 +476,7 @@ def main():
     while True:
         print("\n --- POLIDELIVERY ---")
         print("1. Registrarse")
-        print("2. Iniciar sesión")
+        print("2. Iniciar sesion")
         print("3. Salir")
         opcion = input("Ingrese una opcion: ")
         if opcion == '1':
@@ -462,5 +490,6 @@ def main():
         elif opcion == '3':
             print("Hasta pronto...")
             break
+        else:
+            print("Opcion invalida ")
 main()
-
