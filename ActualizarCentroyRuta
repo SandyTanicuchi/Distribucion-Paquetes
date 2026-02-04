@@ -13,12 +13,37 @@ def contraseña_segura(password):
 
 def registrar_usuario():
     print("\n--- REGISTRO DE USUARIO ---")
-    nombre = input("Nombre: ")
-    apellido = input("Apellido: ")
-    cedula = input("Cédula: ")
-    edad = input("Edad: ")
-    email = input("Correo (nombre.apellido@gmail.com): ")
-    
+
+    while True:
+        nombre = input("Nombre: ")
+        if nombre.isalpha():
+            break
+        print("El nombre debe incluir solo letras\n")
+
+    while True:
+        apellido = input("Apellido: ")
+        if apellido.isalpha():
+            break
+        print("El apellido debe incluir solo letras\n")
+
+    while True:
+        cedula = input("Cédula: ").strip()
+        if cedula.isdigit() and len(cedula) == 10:
+            break
+        print("Debe tener 10 digitos\n")
+
+    while True:
+        edad = input("Edad: ")
+        if edad.isdigit():
+            break
+        print("Edad invalida\n")
+
+    while True:
+        email = input("Correo: ").strip()
+        if "@" in email:
+            break
+        print("Un correo debe contener @\n")
+
     while True:
         password = input("Contraseña: ")
         if contraseña_segura(password):
@@ -55,15 +80,18 @@ def iniciar_sesion():
 
 
 def agregar_centro():
-   try:
-    id = int(input("ID del centro: "))
-except ValueError:
-    print("ID inválido")
-    return
+    try:
+        id = int(input("ID del centro: "))
+    except ValueError:
+        print("ID invalido")
+        return
+   
     nombre = input("Nombre del centro: ")
     region = input("Región: ")
     subregion = input("Subregión: ")
+   
     with open("centros.txt", "a") as f:
+
         f.write(f"{id},{nombre},{region},{subregion}\n")
     print("Centro agregado")
 
@@ -336,7 +364,7 @@ def dfs(grafo, inicio, visitados=None):
     visitados.add(inicio)
     orden = [inicio]
     
-   for vecino, _, _ in grafo.get(inicio, []):
+    for vecino, _, _ in grafo.get(inicio, []):
         if vecino not in visitados:
             orden.extend(dfs(grafo, vecino, visitados))
     return orden
