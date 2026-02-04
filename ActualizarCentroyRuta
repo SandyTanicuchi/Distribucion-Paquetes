@@ -18,12 +18,22 @@ def registrar_usuario():
     cedula = input("Cédula: ")
     edad = input("Edad: ")
     email = input("Correo (nombre.apellido@gmail.com): ")
-    password = input("Contraseña: ")
-    if not contraseña_segura(password):
-        print("Contraseña insegura")
-        return
+    
+    while True:
+        password = input("Contraseña: ")
+        if contraseña_segura(password):
+            break
+        else:
+            print("Contraseña insegura. Debe contener: ")
+            print(" * Una mayuscula")
+            print(" * Una minuscula")
+            print(" * Un numero")
+            print("Intentelo de nuevo...\n")
+
+    rol ="ADMIN" if email == "admin@admin" else "CLIENTE"
+
     with open("usuarios.txt", "a") as f:
-        f.write(f"{nombre},{apellido},{cedula},{edad},{email},{password},CLIENTE\n")
+        f.write(f"\n{nombre},{apellido},{cedula},{edad},{email},{password},{rol}\n")
     print("Usuario registrado correctamente")
 
 
@@ -42,6 +52,21 @@ def iniciar_sesion():
                 return datos[6]
     print("Credenciales incorrectas")
     return None
+
+
+def agregar_centro():
+   try:
+    id = int(input("ID del centro: "))
+except ValueError:
+    print("ID inválido")
+    return
+    nombre = input("Nombre del centro: ")
+    region = input("Región: ")
+    subregion = input("Subregión: ")
+    with open("centros.txt", "a") as f:
+        f.write(f"{id},{nombre},{region},{subregion}\n")
+    print("Centro agregado")
+
 
 
 def leer_centros():
@@ -66,19 +91,6 @@ def leer_centros():
 
     return centros
 
-
-def agregar_centro():
-   try:
-    id = int(input("ID del centro: "))
-except ValueError:
-    print("ID inválido")
-    return
-    nombre = input("Nombre del centro: ")
-    region = input("Región: ")
-    subregion = input("Subregión: ")
-    with open("centros.txt", "a") as f:
-        f.write(f"{id},{nombre},{region},{subregion}\n")
-    print("Centro agregado")
 
 
 def mostrar_centros():
